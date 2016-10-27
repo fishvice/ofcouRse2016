@@ -1,0 +1,52 @@
+---
+title: "of couRse 2016"
+author: "MRI 2nd Training Course in the R ENVironment"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Time and location
+
+__1st session__: 2016-11-09 09:00 - 
+
+__2nd session__: 2016-11-16 09:00 - 
+
+__3rd session__: 2016-11-23 09:00 -
+
+__Location__:
+```{r, fig.width = 9, fig.height = 3, message = FALSE, echo=FALSE}
+library(leaflet)
+content <- paste(sep = "<br/>",
+  "<b><a href='http://veidimal.is'>Veiðimálastofnun</a></b>",
+  "Geitaskarð",
+  "Árleyni 22",
+  "IS 112 Reykjavík, Iceland"
+)
+
+leaflet() %>% 
+  addTiles() %>% 
+  setView(lng = -21.768, lat = 64.13867, zoom = 15) %>%
+   addPopups(-21.768, 64.13867, content,
+             options = popupOptions(closeButton = FALSE))
+```
+
+### Preamble - 1st homework assignment
+___
+
+Prior to the course please install:
+
+* Latest version of __R__: see [The Comprehensive R Archive Network](https://cran.r-project.org/)
+    * If your platform is Windose, also install [Rtools](https://cran.r-project.org/bin/windows/Rtools)
+
+* Latest version of __RStudio__: see [RStudio Desktop](https://www.rstudio.com/products/rstudio/download/)
+    * If you are adventurous install the latest [developmental version](https://www.rstudio.com/products/rstudio/download/preview)
+
+For those that want to get a head we recommend the following reads:
+
+  * [R for Data Science](http://r4ds.had.co.nz)
+  * [A rendered version of the new ggplot2 book](http://www.hafro.is/~einarhj/education/ggplot2)
+  
+
