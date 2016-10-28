@@ -33,8 +33,21 @@ leaflet() %>%
              options = popupOptions(closeButton = FALSE))
 ```
 
-### Preamble - 1st homework assignment
+
+## Preamble
 ___
+
+### The source
+
+A reproducible source of this space is found on [github](https://github.com/fishvice/ofcouRse2016). To get it to on your own computer simply do (within Linux):
+
+```
+git clone https://github.com/fishvice/ofcouRse2016.git
+```
+
+If on Windose there are some buttons on the github page which can be pushed.
+
+### 1st homework assignment
 
 Prior to the course please install:
 
@@ -49,4 +62,21 @@ For those that want to get a head we recommend the following reads:
   * [R for Data Science](http://r4ds.had.co.nz)
   * [A rendered version of the new ggplot2 book](http://www.hafro.is/~einarhj/education/ggplot2)
   
+We recently taught a course in ICES which may give you a hint of some of the stuff we may cover. see this [link](http://www.hafro.is/~einarhj/education/tcrenv2016).
+  
+## 1st day syllabus
+___
+
+... pending
+
+## 2nd day syllabus
+___
+
+... pending
+
+
+## 3rd day syllabus
+___
+
+... pending
 
