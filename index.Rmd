@@ -1,6 +1,6 @@
 ---
 title: "of couRse 2016"
-author: "MRI 2nd Training Course in the R ENVironment"
+author: "Bjarki og Einar"
 output: html_document
 ---
 
@@ -8,16 +8,23 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-### Time and location
+```{r, eval = FALSE, echo = FALSE}
+dsn <- "/home/haf/einarhj/stasi/gis/LMI/IS50V_VATNAFAR_01072013_ISN93/IS50V_VATNAFAR_SHP"
+file <- "is50v_vatnafar_flakar_01072013"
+h2o <- rgdal::readOGR(dsn, file)
+h2o <- sp::spTransform(h2o, gisland::PRO)
+ex <- c(-gisland::geo_convert(c(220732, 212344)),gisland::geo_convert(c(640372, 641346)))
+h2o <- raster::crop(h2o, ex)
+save(h2o, file = "data/h2o.rda")
+```
 
-__1st session__: 2016-11-09 09:00 - 
+### Location and time
+___
 
-__2nd session__: 2016-11-16 09:00 - 
+#### Location
 
-__3rd session__: 2016-11-23 09:00 -
-
-__Location__:
-```{r, fig.width = 9, fig.height = 3, message = FALSE, echo=FALSE}
+```{r, fig.width = 9, fig.height = 3, message = FALSE, echo = FALSE, warning = FALSE}
+attach("data/h2o.rda")
 library(leaflet)
 content <- paste(sep = "<br/>",
   "<b><a href='http://veidimal.is'>Veiðimálastofnun</a></b>",
@@ -28,16 +35,28 @@ content <- paste(sep = "<br/>",
 
 leaflet() %>% 
   addTiles() %>% 
-  setView(lng = -21.768, lat = 64.13867, zoom = 15) %>%
-   addPopups(-21.768, 64.13867, content,
-             options = popupOptions(closeButton = FALSE))
+  addPolygons(data = out, group = "Sprænur og pollar") %>% 
+  setView(lng = -21.768, lat = 64.13867, zoom = 12) %>%
+  addPopups(-21.768, 64.13867, content,
+            options = popupOptions(closeButton = FALSE)) %>% 
+  addLayersControl(overlayGroups = c("Sprænur og pollar"),
+                   options = layersControlOptions(collapsed = FALSE))
 ```
 
+#### Time
 
-## Preamble
+__1st session__: 2016-11-09 09:00 - 
+
+__2nd session__: 2016-11-16 09:00 - 
+
+__3rd session__: 2016-11-23 09:00 -
+
+
+
+### Preamble
 ___
 
-### The source
+#### The source
 
 A reproducible source of this space is found on [github](https://github.com/fishvice/ofcouRse2016). To get it to on your own computer simply do (within Linux):
 
@@ -47,7 +66,7 @@ git clone https://github.com/fishvice/ofcouRse2016.git
 
 If on Windose there are some buttons on the github page which can be pushed.
 
-### 1st homework assignment
+#### 1st homework assignment
 
 Prior to the course please install:
 
@@ -64,18 +83,20 @@ For those that want to get a head we recommend the following reads:
   
 We recently taught a course in ICES which may give you a hint of some of the stuff we may cover. see this [link](http://www.hafro.is/~einarhj/education/tcrenv2016).
   
-## 1st day syllabus
+### 1st day syllabus (2016-11-09 09:00)
+___
+
+* [Introduction](http://www.hafro.is/~einarhj/education/ofcouRse2016/01_introduction.html#%281%29)
+    * [Excercise1.R](http://www.hafro.is/~einarhj/education/ofcouRse2016/R/Exercise1.R)
+* [Visualisation - Introduction to ggplot2](http://www.hafro.is/~einarhj/education/ofcouRse2016/ggplot2.html)
+
+### 2nd day syllabus (2016-11-16 09:00)
 ___
 
 ... pending
 
-## 2nd day syllabus
-___
 
-... pending
-
-
-## 3rd day syllabus
+### 3rd day syllabus (2016-11-23 09:00)
 ___
 
 ... pending
