@@ -18,6 +18,8 @@ source("R/common.R")
 ```{r, message = FALSE, warning = FALSE, results='hide'}
 library(geo)
 library(ggplot2)
+library(ggmap)
+library(gridExtra)
 library(maps)
 library(mapdata)
 ```
@@ -137,6 +139,18 @@ p + geom_point(aes(age, length, shape = maturity))
 
 </div>
 </div>
+
+
+# Digression
+
+Plot side-by-side
+
+```{r, fig.width = 10}
+p1 <- p + geom_point(aes(age, length), colour = "blue")
+p2 <- p + geom_point(aes(age, length, shape = sex))
+grid.arrange(p1, p2, ncol = 2)
+```
+
 
 
 # aesthetic: size
@@ -462,11 +476,55 @@ ggplot(m) +
   coord_quickmap()
 ```
 
+## gis: Lets generate a base map:
+
+`r columns(1)`
+```{r}
+m <- ggplot(island, aes(lon, lat)) +
+  theme_bw() +
+  geom_polygon(fill = "grey90") +
+  coord_map() +
+  labs(x = NULL, y = NULL)
+m
+```
+
+## gis: Add layers
+`r columns(2)`
+```{r}
+m + geom_point(data = d, aes(lon, lat))
+m + geom_point(data = d, aes(lon, lat, colour = area))
+```
+
+```{r}
+m + geom_point(data = d, aes(lon, lat, colour = sex))
+m + geom_point(data = d, aes(lon, lat, colour = year))
+m + geom_point(data = d, aes(lon, lat, colour = factor(year)))
+m + geom_point(data = d, aes(lon, lat, size = length), alpha = 0.2)
+# possible remedy of the above plot - is beyound the basic introduction
+m + geom_point(data = d, aes(lon, lat, colour = length)) +
+  scale_colour_gradient(low = "yellow", high = "red")
+```
+
+## gis: Another type of base map:
+
+```{r}
+m2 <- get_map(location = c(-19,65), zoom= 6, maptype = "satellite", source = "google")
+m2 <- ggmap(m2) +
+  labs(x = NULL, y = NULL)
+m2
+```
+
 <div class="panel panel-warning">
 <div class="panel-heading">Exercise</div>
 <div class="panel-body">
 
-Play with different map areas
+Repeat previous plots where we use "island" or do new ones, but using the google base as a background. E.g.:
+
+`r columns(1, 1, 1.2)`
+```{r, echo = FALSE}
+m2 + geom_point(data = d, aes(lon, lat, colour = maturity))
+```
+
 
 </div>
 </div>
