@@ -2,15 +2,13 @@
 title: "of couRse"
 subtitle: "Introduction"
 author: "Einar Hjörleifsson or Bjarki Þór Elvarsson"
-date: "05/11/2016"
+date: "2016-11-09"
 output:
   slidy_presentation:
     highlight: haddock
   ioslides_presentation: default
   beamer_presentation: default
 ---
-
-... document compilation in progress (`r lubridate::now()`)
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
@@ -27,7 +25,7 @@ knitr::opts_chunk$set(echo = FALSE)
     * Creating new variables that are functions of existing variables
     * Calculating a set of summary statistics (like counts or means)
     * ...
-* Visualise
+* Visualize
     * May show unexpected things
     * May raise new questions about the data
     * A powerful communication platform
@@ -77,7 +75,7 @@ grid.raster(img)
 * **Console**: One can type R commands directly into the console to perform calculations
 * **Script editor**: An R script is basically a series of stored R commands that can be run in the
 console
-    * To generate a new script do: New file -> R Script (ctrl-shif-N)
+    * To generate a new script do: New file -> R Script (ctrl-shift-N)
 * **Environment**: Contains a list of all declared variables. If you have a dataset you can double click the variable to view the data.
 * **History** Contains a list of previous commands entered into the console
 * **Other items**:
@@ -96,7 +94,7 @@ console
 
 ## RStudio project
 
-* RStudio allows us to make things a little bit easier by isolating the various tasks within specific projects
+* RStudio allows us to make things a little bit easier by isolating various tasks within specific projects
 * Projects save the state between sessions. This includes:
     * Working directories
     * Open files/scripts
@@ -116,7 +114,7 @@ Projects are created by selecting File -> New project
 * Open R-studio and create a new project: File -> New project
 * Create a new R script: File -> New file -> R Script
 * Copy the content of [this](http://www.hafro.is/~einarhj/education/ofcouRse2016/R/Exercise1.R) into the R script.
-* Save the script, e.g. Excercise1.R
+* Save the script, e.g. Exercise1.R
 * We will run each line of code, observe, change, add, and most importantly learn while doing
 * Once you have gone through the whole script, try: File -> Compile Report ..., choosing the output according to your liking :-)
 
@@ -135,7 +133,14 @@ But before we start, we may need to install that package
 
 ## R packages
 
-...
+One of R's greatest strengths comes from specialized add-ons, called \textit{packages} that the user can download and install
+
+* Users download packages from CRAN's website (Comprehensive R Archive Network)
+* Currently at 7811 packages (January 20th 2016)
+* All packages comes with both an in-line and pdf manual
+
+![](img/cran_packages.png)
+
 
 ## Installing packages
 
@@ -147,12 +152,12 @@ install.packages("tidyverse")
 
 This will install the __core__ tidyverse packages:
 
-* ggplot2, for data visualisation.
+* ggplot2, for data visualization.
 * dplyr, for data manipulation.
 * tidyr, for data tidying.
 * readr, for data import.
 * purrr, for functional programming.
-* tibble, for tibbles, a modern re-imagining of data frames.
+* tibble, for nibbles, a modern re-imagining of data frames.
 
 It also installs a selection of other tidyverse packages that you're likely to use frequently, but probably not in every analysis. This includes packages for:
 
@@ -202,6 +207,7 @@ install.packages("lubridate")       # for working with dates
 install.packages("geo")          # The old MRI faithful for geoplots
 install.packages("ggmap")        # Fancy gis map backgrounds
 install.packages("viridis")      # Nicer colour schemes than as ggplot2
+install.packages("devtools")     # Aid in developing packages
 ```
 
 You can expect that there will be some additional packages to install as we progress.

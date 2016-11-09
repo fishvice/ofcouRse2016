@@ -11,6 +11,15 @@ exp(1)               # e to the power 2
 log(5)               # natural logaritm (ln) of 5
 log10(5)             # base 10 log of 5
 
+# Get help on functions
+?log
+
+# Data types
+class(1.2)           # number
+class("A")           # string
+class(TRUE)          # logical
+class(factor('A'))   # factor
+
 x <- 1 + 1           # save the result of a calculation as an object
                      # "assignment" shortcut: Alt minus sign (Alt+ -)
 x                    # inspect an object by typing its name
@@ -58,12 +67,6 @@ x[x < 3]
 x[x != 3 & x < 5]    # all elements that not equal to 3 and <5
 x[is.na(x)]          # all elements that are NA
 x[!is.na(x)]         # all elements that are not NA
-
-# Data types
-class(1.2)           # number
-class("A")           # string
-class(TRUE)          # logical
-class(factor('A'))   # factor
 
 # Summary statistics
 x <- rnorm(n = 50, mean = 20, sd = 4)
