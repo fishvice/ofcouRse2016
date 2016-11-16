@@ -35,7 +35,7 @@ content <- paste(sep = "<br/>",
 
 leaflet() %>% 
   addTiles() %>% 
-  addPolygons(data = out, group = "Sprænur og pollar") %>% 
+  addPolygons(data = h2o, group = "Sprænur og pollar") %>% 
   setView(lng = -21.768, lat = 64.13867, zoom = 12) %>%
   addPopups(-21.768, 64.13867, content,
             options = popupOptions(closeButton = FALSE)) %>% 
@@ -93,7 +93,7 @@ ___
 ### 2nd day syllabus (2016-11-16 09:00)
 ___
 
-... pending
+* [Grammar of data - Introduction to dplyr](http://www.hafro.is/~einarhj/education/ofcouRse2016/dplyr.html)
 
 
 ### 3rd day syllabus (2016-11-23 09:00)
