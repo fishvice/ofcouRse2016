@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r, eval = FALSE, echo = FALSE}
 dsn <- "/home/haf/einarhj/stasi/gis/LMI/IS50V_VATNAFAR_01072013_ISN93/IS50V_VATNAFAR_SHP"
-file <- "is50v_vatnafar_flakar_01072013"
+file <- "is50v_vatnafar_flakar_01072013" 
 h2o <- rgdal::readOGR(dsn, file)
 h2o <- sp::spTransform(h2o, gisland::PRO)
 ex <- c(-gisland::geo_convert(c(220732, 212344)),gisland::geo_convert(c(640372, 641346)))
