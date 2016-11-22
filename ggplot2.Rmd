@@ -9,7 +9,7 @@ knitr::opts_chunk$set(warning = FALSE,
 ```
 
 ```{r, echo = FALSE}
-source("R/common.R")
+#source("R/common.R")
 ```
 
 # Preamble

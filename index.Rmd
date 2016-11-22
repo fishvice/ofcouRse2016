@@ -35,11 +35,11 @@ content <- paste(sep = "<br/>",
 
 leaflet() %>% 
   addTiles() %>% 
-  addPolygons(data = h2o, group = "Sprænur og pollar") %>% 
+  addPolygons(data = h2o, group = "Ár og vötn") %>% 
   setView(lng = -21.768, lat = 64.13867, zoom = 12) %>%
   addPopups(-21.768, 64.13867, content,
             options = popupOptions(closeButton = FALSE)) %>% 
-  addLayersControl(overlayGroups = c("Sprænur og pollar"),
+  addLayersControl(overlayGroups = c("Ár og vötn"),
                    options = layersControlOptions(collapsed = FALSE))
 ```
 
@@ -99,5 +99,9 @@ ___
 ### 3rd day syllabus (2016-11-23 09:00)
 ___
 
-... pending
+* ... model eitthvað
+
+* [Veiðiskýrslur](http://www.hafro.is/~einarhj/education/ofcouRse2016/veidiskyrslur.html)
+    * [Elliðaár - lax 2015](http://www.hafro.is/~einarhj/education/ofcouRse2016/ellidaar_veidiskyrsla2015.pdf)
+
 

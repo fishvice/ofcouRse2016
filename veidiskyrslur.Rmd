@@ -1,0 +1,325 @@
+---
+title: "Samantektarskýrsla 2015"
+subtitle: "Elliðaár - Lax"
+author: "Einar og Bjarki"
+date: "17 11 2016"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      message = FALSE,
+                      warning = FALSE)
+```
+
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(stringr)
+library(lubridate)
+library(readxl)
+library(knitr)
+```
+
+# Import and tidying
+
+Importing data:
+
+```{r}
+#download.file('http://www.hafro.is/~einarhj/education/ofcouRse2016/data/ellidaar.xlsx',
+#              'ellidaar.xlsx')
+d_untidy <- read_excel('ellidaar.xlsx')
+lw <- readr::read_csv("http://www.hafro.is/~einarhj/education/ofcouRse2016/data/lw.csv")
+```
+
+Tidying:
+
+```{r}
+d <-
+  d_untidy %>% 
+  select(Vatnsfall:Athugasemd) %>% 
+  rename(fall = Vatnsfall,
+         svaedi = Veiðisvæði,
+         stadur = Veiðistaður,
+         madur = Veiðimaður,
+         dags = Dags,
+         #tegund = Fisktegund,
+         kyn = Kyn,
+         stada = Staða,
+         thyngd = `Þyngd (kg)`,
+         lengd = `Lengd (cm)`,
+         sleppt = Sleppt,
+         veidarfaeri = Veiðarfæri,
+         beita_heiti = `Heiti beitu`,
+         beita_staerd = `Stærð beitu`,
+         athugasemd = Athugasemd) %>% 
+  mutate(ar = year(dags),
+         vika = week(dags)) %>% 
+  select(-c(fall, svaedi, madur, veidarfaeri, beita_heiti, beita_staerd, athugasemd)) %>% 
+  separate(kyn, c("sex", "Kyn"), convert = TRUE) %>% 
+  mutate(sleppt = ifelse(is.na(sleppt), 0, sleppt),
+         sleppt = ifelse(sleppt == 0, "Afli", "Sleppt"),
+         Kyn = ifelse(Kyn == "Óþekkt", "Ókyngreind", Kyn))
+```
+
+
+Filtering:
+
+```{r}
+Ar <- c(2015)
+Tegund <- c("Lax")
+
+d2 <- 
+  d %>% 
+  filter(Fisktegund %in% Tegund,
+         ar %in% Ar) %>% 
+  select(-Fisktegund, -ar)
+```
+
+# Fjöldatölur/fisktegund
+
+```{r}
+d2 %>% 
+  group_by(sleppt) %>% 
+  summarise(Fjöldi = n()) %>% 
+  ungroup() %>% 
+  kable()
+```
+
+# Fjöldatölur/kyn
+
+```{r}
+x1 <-
+  d2 %>% 
+  group_by(sleppt, Kyn) %>% 
+  summarise(Fjöldi = n()) %>% 
+  ungroup()
+x2 <-
+  d2 %>% 
+  group_by(Kyn) %>% 
+  summarise(Fjöldi = n()) %>% 
+  ungroup()
+bind_rows(x1, x2) %>% 
+  mutate(sleppt = ifelse(is.na(sleppt), "Veiði", sleppt)) %>% 
+  rename(` ` = sleppt) %>% 
+  kable()
+```
+
+# Þyngdartölur
+
+... pending
+
+# Veiðistaðir
+
+```{r}
+d2 %>% 
+  group_by(stadur) %>% 
+  summarise(Fjöldi = n()) %>%
+  mutate(Hlutfall = round(Fjöldi/sum(Fjöldi) * 100, 1)) %>%
+  ungroup() %>% 
+  kable()
+```
+
+# Veiðidagar
+
+```{r}
+d2 %>% 
+  arrange(dags) %>% 
+  group_by(dags) %>% 
+  summarise(Fjöldi = n()) %>% 
+  mutate(Hlutfall = round(Fjöldi/sum(Fjöldi) * 100, 1),
+         Heildarfjöldi = cumsum(Fjöldi),
+         `Hlufall af heild` = round(Heildarfjöldi/max(Heildarfjöldi) * 100, 1)) %>%
+  ungroup() %>% 
+  kable()
+```
+
+# Veiðivikur
+
+```{r}
+x <-
+  d2 %>% 
+  group_by(vika) %>% 
+  summarise(`Dags frá` = min(dags),
+            `Dags til` = max(dags),
+            Fjöldi = n()) %>% 
+  ungroup()
+x %>% kable()
+
+p <-
+  x %>% 
+  ggplot() +
+  geom_bar(aes(reorder(vika, -vika), Fjöldi), stat = "identity", fill = "red") +
+  coord_flip() +
+  labs(x = "Vika", title = "Lax")
+p
+```
+
+# Þyngdardreifing veiði
+
+... corrections pending
+
+```{r}
+d2 <- 
+  d2 %>% 
+  left_join(lw)
+  
+x <-
+  d2 %>% 
+  mutate(Þyngdarbil = cut(thyngd_est, c(seq(1, 5, 0.5), 8))) %>% 
+  group_by(Þyngdarbil) %>% 
+  summarise(Fjöldi = n()) %>% 
+  ungroup() %>% 
+  mutate(Þyngdarbil = as.character(Þyngdarbil),
+          Þyngdarbil = str_replace(Þyngdarbil, "\\(", ""),
+          Þyngdarbil = str_replace(Þyngdarbil, "\\]", "")) %>% 
+  separate(Þyngdarbil, c("Þyngd frá", "Þyngd til"), sep = ",",convert = T)
+x %>%  kable()
+x %>% 
+  ggplot(aes(`Þyngd frá`, Fjöldi)) +
+  geom_bar(stat = "identity", fill = "red") +
+  scale_x_reverse() +
+  coord_flip()
+```
+
+# Þyngdardreifing afli
+
+... corrections pending
+
+```{r}
+x <-
+  d2 %>% 
+  filter(sleppt == "Afli") %>% 
+  mutate(Þyngdarbil = cut(thyngd_est, c(seq(1, 5, 0.5), 8))) %>% 
+  group_by(Þyngdarbil) %>% 
+  summarise(Fjöldi = n()) %>% 
+    ungroup() %>% 
+  mutate(Þyngdarbil = as.character(Þyngdarbil),
+          Þyngdarbil = str_replace(Þyngdarbil, "\\(", ""),
+          Þyngdarbil = str_replace(Þyngdarbil, "\\]", "")) %>% 
+  separate(Þyngdarbil, c("Þyngd frá", "Þyngd til"), sep = ",",convert = T)
+x %>%  kable()
+x %>% 
+  ggplot(aes(`Þyngd frá`, Fjöldi)) +
+  geom_bar(stat = "identity", fill = "red") +
+  scale_x_reverse() +
+  coord_flip()
+```
+
+# Þyngdardreifing kyn
+
+... corrections pending
+
+```{r}
+x <-
+  d2 %>% 
+  mutate(Þyngdarbil = cut(thyngd_est, c(seq(1, 5, 0.5), 8))) %>% 
+  group_by(Þyngdarbil, Kyn) %>% 
+  summarise(Fjöldi = n()) %>% 
+  ungroup() %>% 
+  mutate(Þyngdarbil = as.character(Þyngdarbil),
+          Þyngdarbil = str_replace(Þyngdarbil, "\\(", ""),
+          Þyngdarbil = str_replace(Þyngdarbil, "\\]", "")) %>% 
+  separate(Þyngdarbil, c("Þyngd frá", "Þyngd til"), sep = ",",convert = T)
+
+
+x %>%  arrange(Kyn) %>% kable() 
+x %>% 
+  ggplot(aes(`Þyngd frá`, Fjöldi, fill = Kyn)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_x_reverse() +
+  coord_flip()
+```
+
+# Lengdardreifing veiði
+
+... correction pending
+```{r}
+x <-
+  d2 %>% 
+  group_by(lengd) %>% 
+  summarise(Fjöldi = n())
+x %>% kable()
+x %>% 
+  ggplot(aes(lengd, Fjöldi)) +
+  geom_bar(stat = "identity", fill = "red") +
+  coord_flip() +
+  scale_x_reverse()
+```
+
+
+# Lengdardreifing afli
+
+... correction pending
+
+```{r}
+x <-
+  d2 %>% 
+  filter(sleppt == "Afli") %>% 
+  group_by(lengd) %>% 
+  summarise(Fjöldi = n())
+x %>% kable()
+x %>% 
+  ggplot(aes(lengd, Fjöldi)) +
+  geom_bar(stat = "identity", fill = "red") +
+  coord_flip() +
+  scale_x_reverse()
+```
+
+# Appendices
+
+## Skipting eftir árum í sjó
+
+```{r}
+x <-
+  d2 %>% 
+  mutate(veginn = ifelse(is.na(thyngd), "óveginn", "veginn"),
+         thyngd = ifelse(is.na(thyngd), thyngd_est, thyngd),
+         ais = ifelse(Kyn == "Hængur" & thyngd < 4, 1,
+                      ifelse(Kyn == "Hængur" & thyngd >= 4, 2,
+                             ifelse(thyngd < 3.5, 1, 2))))
+options(knitr.kable.NA = '') # should be put to top
+x %>% 
+  mutate(ais = ifelse(veginn == "veginn", ais, "Óvíst"),
+         thyngd = ifelse(veginn == "veginn", thyngd, NA)) %>% 
+  group_by(ais, Kyn, veginn) %>% 
+  summarise(Fjöldi = n(),
+            Heildarþyngd = round(sum(thyngd),2),
+            Meðalþyngd = round(mean(thyngd),2)) %>% 
+  group_by(ais) %>% 
+  mutate(Hlutfall = round(Fjöldi/sum(Fjöldi) * 100, 1)) %>% 
+  arrange(desc(veginn), ais) %>% 
+  select(-veginn) %>% 
+  knitr::kable()
+```
+
+## Veiði, skráð gildi, uppreiknað með ókyngreindum
+
+## Veiði, reiknuð gildi
+
+```{r}
+x2 <-
+  x %>% 
+  group_by(ais, Kyn) %>% 
+  summarise(Fjöldi = n(),
+            Heildarþyngd = round(sum(thyngd),2),
+            Meðalþyngd = round(mean(thyngd),2)) %>% 
+  group_by(ais) %>% 
+  mutate(Hlutfall = round(Fjöldi/sum(Fjöldi) * 100, 1)) %>% 
+  arrange(ais) 
+x2  %>% knitr::kable()
+```
+
+## Veiði, reiknuð gildi, uppreiknað með ókyngreindum
+
+## Afli, reiknuð gildi
+
+## Afli, reiknuð gildi, uppreiknað með ókyngreindum
+
+
