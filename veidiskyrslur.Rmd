@@ -1,8 +1,6 @@
 ---
 title: "Samantektarskýrsla 2015"
 subtitle: "Elliðaár - Lax"
-author: "Einar og Bjarki"
-date: "17 11 2016"
 output:
   html_document:
     toc: true
@@ -16,6 +14,13 @@ knitr::opts_chunk$set(echo = TRUE,
                       warning = FALSE)
 ```
 
+# Preamble
+
+And attempt to mimic a report now generated via java script provided by Fiskistofa. The basis of the mimicry is [Elliðiaárskýrsla 2015](http://www.hafro.is/~einarhj/education/ofcouRse2016/ellidaar_veidiskyrsla2015.pdf). The source set we use is the [Excel-sheet](http://www.hafro.is/~einarhj/education/ofcouRse2016/data/ellidaar.xlsx) we used on Day 1, as well one additional [data set](http://www.hafro.is/~einarhj/education/ofcouRse2016/data/lw.csv) that is used to convert length to weight, if weight is not given.
+
+In the classroom you are encouraged to think about how to generate the various summary statistics using the knowledge already covered on Day 1 and 2 (with some minor addition). This document provides all the code - although not shown as default. If stuck, one can obtain a sneek preview by pressing the `code`-button. Use that sparingly.
+
+__Libraries needed__:
 
 ```{r}
 library(dplyr)
@@ -29,7 +34,9 @@ library(knitr)
 
 # Import and tidying
 
-Importing data:
+Sneek preview allowed in this section, just to get you going.
+
+__Importing data__:
 
 ```{r}
 #download.file('http://www.hafro.is/~einarhj/education/ofcouRse2016/data/ellidaar.xlsx',
@@ -38,7 +45,7 @@ d_untidy <- read_excel('ellidaar.xlsx')
 lw <- readr::read_csv("http://www.hafro.is/~einarhj/education/ofcouRse2016/data/lw.csv")
 ```
 
-Tidying:
+__Tidying__:
 
 ```{r}
 d <-
@@ -54,7 +61,7 @@ d <-
          stada = Staða,
          thyngd = `Þyngd (kg)`,
          lengd = `Lengd (cm)`,
-         sleppt = Sleppt,
+         Flokkur = Sleppt,
          veidarfaeri = Veiðarfæri,
          beita_heiti = `Heiti beitu`,
          beita_staerd = `Stærð beitu`,
@@ -63,13 +70,13 @@ d <-
          vika = week(dags)) %>% 
   select(-c(fall, svaedi, madur, veidarfaeri, beita_heiti, beita_staerd, athugasemd)) %>% 
   separate(kyn, c("sex", "Kyn"), convert = TRUE) %>% 
-  mutate(sleppt = ifelse(is.na(sleppt), 0, sleppt),
-         sleppt = ifelse(sleppt == 0, "Afli", "Sleppt"),
-         Kyn = ifelse(Kyn == "Óþekkt", "Ókyngreind", Kyn))
+  mutate(Flokkur = ifelse(is.na(Flokkur), 0, Flokkur),
+         Flokkur = ifelse(Flokkur == 0, "Afli", "Sleppt"),
+         Kyn = ifelse(Kyn == "Óþekkt", "Ókyngreint", Kyn))
 ```
 
 
-Filtering:
+__Filtering__:
 
 ```{r}
 Ar <- c(2015)
@@ -82,11 +89,19 @@ d2 <-
   select(-Fisktegund, -ar)
 ```
 
+__Add estimated weight__:
+
+```{r}
+d2 <- 
+  d2 %>% 
+  left_join(lw)
+```
+
 # Fjöldatölur/fisktegund
 
 ```{r}
 d2 %>% 
-  group_by(sleppt) %>% 
+  group_by(Flokkur) %>% 
   summarise(Fjöldi = n()) %>% 
   ungroup() %>% 
   kable()
@@ -97,7 +112,7 @@ d2 %>%
 ```{r}
 x1 <-
   d2 %>% 
-  group_by(sleppt, Kyn) %>% 
+  group_by(Flokkur, Kyn) %>% 
   summarise(Fjöldi = n()) %>% 
   ungroup()
 x2 <-
@@ -106,14 +121,42 @@ x2 <-
   summarise(Fjöldi = n()) %>% 
   ungroup()
 bind_rows(x1, x2) %>% 
-  mutate(sleppt = ifelse(is.na(sleppt), "Veiði", sleppt)) %>% 
-  rename(` ` = sleppt) %>% 
+  mutate(Flokkur = ifelse(is.na(Flokkur), "Veiði", Flokkur)) %>% 
   kable()
 ```
 
 # Þyngdartölur
 
-... pending
+__Afli__: áætluð heildarþyngd
+```{r}
+d2 %>% 
+  filter(Flokkur == "Afli") %>% 
+  mutate(thyngd = ifelse(is.na(thyngd), thyngd_est, thyngd)) %>% 
+  group_by(Kyn) %>% 
+  summarise(n = n(),
+            Þyngd = sum(thyngd),
+            Meðalþyngd = round(mean(thyngd),2)) %>% 
+  kable()
+```
+
+__Afli__: heildarþyngd
+
+need further info
+
+__Veiði__: áætluð heildarþyngd
+```{r}
+d2 %>% 
+  mutate(thyngd = ifelse(is.na(thyngd), thyngd_est, thyngd)) %>% 
+  group_by(Kyn) %>% 
+  summarise(n = n(),
+            Þyngd = sum(thyngd),
+            Meðalþyngd = round(mean(thyngd),2)) %>% 
+  kable()
+```
+
+__Veiði__: Heildarþyngd
+
+need further info
 
 # Veiðistaðir
 
@@ -163,16 +206,12 @@ p
 
 # Þyngdardreifing veiði
 
-... corrections pending
+... does not match report
 
 ```{r}
-d2 <- 
-  d2 %>% 
-  left_join(lw)
-  
 x <-
   d2 %>% 
-  mutate(Þyngdarbil = cut(thyngd_est, c(seq(1, 5, 0.5), 8))) %>% 
+  mutate(Þyngdarbil = cut(thyngd_est, c(seq(1, 5.5, 0.5), 8))) %>% 
   group_by(Þyngdarbil) %>% 
   summarise(Fjöldi = n()) %>% 
   ungroup() %>% 
@@ -190,13 +229,14 @@ x %>%
 
 # Þyngdardreifing afli
 
-... corrections pending
+... does not match report
 
 ```{r}
 x <-
   d2 %>% 
-  filter(sleppt == "Afli") %>% 
-  mutate(Þyngdarbil = cut(thyngd_est, c(seq(1, 5, 0.5), 8))) %>% 
+  filter(Flokkur == "Afli") %>% 
+  mutate(thyngd = ifelse(is.na(thyngd), thyngd_est, thyngd),
+         Þyngdarbil = cut(thyngd, c(seq(1, 5.5, 0.5), 8))) %>% 
   group_by(Þyngdarbil) %>% 
   summarise(Fjöldi = n()) %>% 
     ungroup() %>% 
@@ -214,7 +254,7 @@ x %>%
 
 # Þyngdardreifing kyn
 
-... corrections pending
+... does not match report
 
 ```{r}
 x <-
@@ -239,7 +279,6 @@ x %>%
 
 # Lengdardreifing veiði
 
-... correction pending
 ```{r}
 x <-
   d2 %>% 
@@ -253,6 +292,7 @@ x %>%
   scale_x_reverse()
 ```
 
+NA not in report
 
 # Lengdardreifing afli
 
@@ -261,7 +301,7 @@ x %>%
 ```{r}
 x <-
   d2 %>% 
-  filter(sleppt == "Afli") %>% 
+  filter(Flokkur == "Afli") %>% 
   group_by(lengd) %>% 
   summarise(Fjöldi = n())
 x %>% kable()
@@ -272,10 +312,12 @@ x %>%
   scale_x_reverse()
 ```
 
-# Appendices
+# Viðbætur
+___
 
 ## Skipting eftir árum í sjó
 
+#### __Veiði__: Skráð gildi
 ```{r}
 x <-
   d2 %>% 
@@ -299,27 +341,22 @@ x %>%
   knitr::kable()
 ```
 
-## Veiði, skráð gildi, uppreiknað með ókyngreindum
+#### __Veiði__: Skráð gildi, uppreiknað með ókyngreindum
 
-## Veiði, reiknuð gildi
+....
 
-```{r}
-x2 <-
-  x %>% 
-  group_by(ais, Kyn) %>% 
-  summarise(Fjöldi = n(),
-            Heildarþyngd = round(sum(thyngd),2),
-            Meðalþyngd = round(mean(thyngd),2)) %>% 
-  group_by(ais) %>% 
-  mutate(Hlutfall = round(Fjöldi/sum(Fjöldi) * 100, 1)) %>% 
-  arrange(ais) 
-x2  %>% knitr::kable()
-```
+#### __Veiði__: Reiknuð gildi
 
-## Veiði, reiknuð gildi, uppreiknað með ókyngreindum
+....
 
-## Afli, reiknuð gildi
+#### __Veiði__: Reiknuð gildi, uppreiknað með ókyngreindum
 
-## Afli, reiknuð gildi, uppreiknað með ókyngreindum
+....
 
+#### __Afli__: Reiknuð gildi
 
+....
+
+#### __Afli__: Reiknuð gildi, uppreiknað með ókyngreindum
+
+....
