@@ -1,0 +1,64 @@
+---
+title: "Removing Icelandic characters"
+author: "Bjarki Þór Elvarsson"
+date: "November 22, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Icelandic characters often cause grief when working with data in R, especially when teaching:) Here is how I replaced Icelandic characters with ASCII equivalents.
+
+## Needed libraries
+
+```{r, message = FALSE, warning = FALSE, results='hide'}
+library(tidyverse)
+library(readxl)
+library(stringr)
+```
+
+## Functions defined
+
+Let's get rid of all Icelandic characters from the data. These functions replace Icelandic letters from a given string:
+```{r,message=FALSE,warning=FALSE}
+elim_ice <- 
+  function(x){
+  tolower(x) %>% 
+    str_replace_all('[þ]','th') %>% 
+    str_replace_all('[ð]','d') %>% 
+    str_replace_all('[æ]','ae') %>% 
+    str_replace_all('[ý]','y') %>% 
+    str_replace_all('[í]','i') %>% 
+    str_replace_all('[á]','a') %>%
+    str_replace_all('[é]','e') %>% 
+    str_replace_all('[ö]','o') %>%
+    str_replace_all('[ó]','o') %>%
+    str_replace_all('[ ]','.') %>%  
+    str_replace_all('[())]','') 
+}
+
+elim_crud <- 
+  function(x){
+    x %>% 
+    str_replace_all('[0-9.-]','')
+  }
+
+```
+
+Now apply these functions to the column names and all character columns:
+
+```{r,message=FALSE,warning=FALSE}
+
+ellidaar <- 
+  read_excel("data/ellidaar.xlsx") %>% 
+  rename_(.dots=stats::setNames(colnames(.) %>% map(as.name),
+                                elim_ice(colnames(.)))) %>% 
+  map_if(~class(.)[1]=='character',elim_ice) %>% 
+  map_if(~class(.)[1]=='character',elim_crud) %>% 
+  as_data_frame()
+
+str(ellidaar)
+```
+
