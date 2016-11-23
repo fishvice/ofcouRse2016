@@ -99,9 +99,6 @@ ___
 ### 3rd day syllabus (2016-11-23 09:00)
 ___
 
-* ... model eitthvað
-
+* [Statistics in R - Commonly used statistical functions](http://www.hafro.is/~einarhj/education/ofcouRse2016/statistics.html)
 * [Veiðiskýrslur](http://www.hafro.is/~einarhj/education/ofcouRse2016/veidiskyrslur.html)
-    * [Elliðaár - lax 2015](http://www.hafro.is/~einarhj/education/ofcouRse2016/ellidaar_veidiskyrsla2015.pdf)
-
 

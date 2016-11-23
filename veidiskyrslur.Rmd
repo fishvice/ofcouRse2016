@@ -16,7 +16,7 @@ knitr::opts_chunk$set(echo = TRUE,
 
 # Preamble
 
-And attempt to mimic a report now generated via java script provided by Fiskistofa. The basis of the mimicry is [Elliðiaárskýrsla 2015](http://www.hafro.is/~einarhj/education/ofcouRse2016/ellidaar_veidiskyrsla2015.pdf). The source set we use is the [Excel-sheet](http://www.hafro.is/~einarhj/education/ofcouRse2016/data/ellidaar.xlsx) we used on Day 1, as well one additional [data set](http://www.hafro.is/~einarhj/education/ofcouRse2016/data/lw.csv) that is used to convert length to weight, if weight is not given.
+A first attempt to mimic a report now generated via java script provided by Fiskistofa. The basis of the mimicry is [Elliðiaárskýrsla 2015](http://www.hafro.is/~einarhj/education/ofcouRse2016/ellidaar_veidiskyrsla2015.pdf). The source data set we use is the [Excel-sheet](http://www.hafro.is/~einarhj/education/ofcouRse2016/data/ellidaar.xlsx) we used on Day 1, as well one additional [data set](http://www.hafro.is/~einarhj/education/ofcouRse2016/data/lw.csv) that is used to convert length to weight, if weight is not given.
 
 In the classroom you are encouraged to think about how to generate the various summary statistics using the knowledge already covered on Day 1 and 2 (with some minor addition). This document provides all the code - although not shown as default. If stuck, one can obtain a sneek preview by pressing the `code`-button. Use that sparingly.
 
@@ -92,6 +92,7 @@ d2 <-
 __Add estimated weight__:
 
 ```{r}
+d2 <- read.csv("data/d2.csv", stringsAsFactors = FALSE)
 d2 <- 
   d2 %>% 
   left_join(lw)
@@ -211,7 +212,8 @@ p
 ```{r}
 x <-
   d2 %>% 
-  mutate(Þyngdarbil = cut(thyngd_est, c(seq(1, 5.5, 0.5), 8))) %>% 
+  mutate(thyngd_est = ifelse(is.na(thyngd_est), thyngd, thyngd_est),
+         Þyngdarbil = cut(thyngd_est, c(seq(1, 5.5, 0.5), 8))) %>% 
   group_by(Þyngdarbil) %>% 
   summarise(Fjöldi = n()) %>% 
   ungroup() %>% 
