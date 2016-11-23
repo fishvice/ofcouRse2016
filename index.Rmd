@@ -100,5 +100,6 @@ ___
 ___
 
 * [Statistics in R - Commonly used statistical functions](http://www.hafro.is/~einarhj/education/ofcouRse2016/statistics.html)
+
 * [Veiðiskýrslur](http://www.hafro.is/~einarhj/education/ofcouRse2016/veidiskyrslur.html)
 
